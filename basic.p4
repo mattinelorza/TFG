@@ -71,6 +71,10 @@ parser MyParser(packet_in packet,
 ************   C H E C K S U M    V E R I F I C A T I O N   *************
 *************************************************************************/
 
+
+/* los bloques de control son como funciones en C*/
+
+
 control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
     apply {  }
 }
