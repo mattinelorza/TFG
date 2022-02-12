@@ -133,10 +133,28 @@ control MyIngress(inout headers hdr,
         default_action = drop();
     }
 
-    // TODO: declare a new action: myTunnel_forward(egressSpec_t port)
+    // declaración de la acción: myTunnel_forward(egressSpec_t port)
 
+    action myTunnel_forward(egressSpec_t port){
+        standard_metadata.egress_spec = port;
+    }
 
-    // TODO: declare a new table: myTunnel_exact
+    // declaración de la nueva tabla myTunnel_exact
+    table myTunnel_exact{
+
+        key = {
+            hdr.myTunnel.dst_id = exact; // OJO exact!
+        }
+
+        actions = {
+            myTunnel_forward;
+            drop;
+
+        }
+        size = 1024;
+        default_action = drop();
+
+    }
     // TODO: also remember to add table entries!
 
 
