@@ -176,7 +176,7 @@ control MyDeparser(packet_out packet, in headers hdr) {
         //Inserta caberceras al paquete en caso de que sea valido
         packet.emit(hdr.ethernet);
         packet.emit(hdr.ipv4);
-        //OJO acordarse del header ipv4
+        /*OJO acordarse del header ipv4*/
 
 
 
