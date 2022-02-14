@@ -56,7 +56,7 @@ struct headers {
 *********************** P A R S E R  ***********************************
 *************************************************************************/
 
-// TODO: Update the parser to parse the myTunnel header as well
+// FALTA TERMINAR EL PARSER
 parser MyParser(packet_in packet,
                 out headers hdr,
                 inout metadata meta,
@@ -155,13 +155,18 @@ control MyIngress(inout headers hdr,
         default_action = drop();
 
     }
-    // TODO: also remember to add table entries!
+   
 
 
     apply {
-        // TODO: Update control flow
-        if (hdr.ipv4.isValid()) {
+        
+        if (hdr.ipv4.isValid()&& !hdr.myTunnel.isValid()) {
             ipv4_lpm.apply();
+            
+        }
+        if(hdr.myTunnel.isValid()){
+            myTunnel_exact.apply();
+
         }
     }
 }
@@ -173,7 +178,7 @@ control MyIngress(inout headers hdr,
 control MyEgress(inout headers hdr,
                  inout metadata meta,
                  inout standard_metadata_t standard_metadata) {
-    apply {  }
+    apply {}
 }
 
 /*************************************************************************
@@ -207,8 +212,8 @@ control MyComputeChecksum(inout headers  hdr, inout metadata meta) {
 control MyDeparser(packet_out packet, in headers hdr) {
     apply {
         packet.emit(hdr.ethernet);
-        // TODO: emit myTunnel header as well
         packet.emit(hdr.ipv4);
+        packet.emit(hdr.myTunnel);
     }
 }
 
