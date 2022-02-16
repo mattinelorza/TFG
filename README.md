@@ -8,4 +8,7 @@ Basic_tunnel.p4 falta el apartado del parser
 
 
 
-p4Runtime leido, falta configurar .py
+p4Runtime leido
+
+
+ngsdn primeras preguntas hechas
