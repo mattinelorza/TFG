@@ -32,7 +32,7 @@ id: 1
 name: "port_num"
 bitwidth: 9
 
-``
+```
 
 ## At the end of the file, look for the definition of the controller_packet_metadata message with name packet_out at the end of the file. Now look at the definition of header cpu_out_header_t in the P4 program. Do you see any relationship between the two?
 
