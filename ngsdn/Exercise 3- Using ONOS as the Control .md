@@ -12,19 +12,19 @@ make restart
 ``` 
 make onos-log
 ``` 
-### iniciar interfaz de linea de comandos onos
+### Iniciar interfaz de linea de comandos onos
 
 ```
 make onos-cli
 ```
 
-### mostrar aplicaciónes en funcionamiento
+### Mostrar aplicaciónes en funcionamiento
 
 ```
 apps -a -s
 ```
 
-### salir del cli de ONOS 
+### Salir del cli de ONOS 
  
 ```
 Ctrl-D
