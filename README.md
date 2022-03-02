@@ -13,7 +13,10 @@ p4Runtime leido
 
 ngsdn
 
-*Tutotial 1 falla añadir el puerto
+*Tutorial 1 falla añadir el puerto
+
 *Tutorial 2 terminado
+
 *Tutorial 3 falta el 3. apartado
+
 *Tutorial 4 sin terminar y con fallo en el test
