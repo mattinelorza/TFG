@@ -27,7 +27,7 @@ if (hdr.cpu_out.isValid()) {
 ### 1. Set cpu_in header as valid
 ### 2. Set the cpu_in.ingress_port field to the original packet's ingress port (standard_metadata.ingress_port).
 
-```
+```p4
 
 if (standard_metadata.egress_port == CPU_PORT) {
             
