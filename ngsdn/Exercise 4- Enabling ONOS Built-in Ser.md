@@ -47,7 +47,7 @@ if (standard_metadata.egress_port == CPU_PORT) {
 
 ```
 
-```
+```p4
 self.insert(self.helper.build_table_entry(
             table_name="IngressPipeImpl.acl_table",
             match_fields={
