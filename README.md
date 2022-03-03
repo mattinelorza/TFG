@@ -20,3 +20,5 @@ ngsdn
 * Tutorial 3 falta el 3. apartado
 
 * Tutorial 4 sin terminar y con fallo en el test
+
+* Turorial 5 falta empezar a modificar el código y volver a leerlo
