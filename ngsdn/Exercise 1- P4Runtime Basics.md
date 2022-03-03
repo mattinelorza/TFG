@@ -1,6 +1,7 @@
 
 
-# He terminado el ejercicio aunque daba un error el .py al asignarle el puerto
+# He terminado el ejercicio aunque daba un error el .py al hacer el te.insert()
+* Está indicado al finall del documento
 
 ## What is the fully qualified name of the l2_exact_table? What is its numeric ID?
 
@@ -37,4 +38,17 @@ bitwidth: 9
 ## At the end of the file, look for the definition of the controller_packet_metadata message with name packet_out at the end of the file. Now look at the definition of header cpu_out_header_t in the P4 program. Do you see any relationship between the two?
 
 * En el p4 info se hace referencia en la anotación a la cabecera del programa principal.
+
+
+```python
+te = table_entry['IngressPipeImpl.l2_exact_table'](action='IngressPipeImpl.set_egress_port')
+te.match['hdr.ethernet.dst_addr'] = '00:00:00:00:00:1A'
+te.action['port_num'] = '3'
+te.insert()
+
+te = table_entry['IngressPipeImpl.l2_exact_table'](action='IngressPipeImpl.set_egress_port')
+te.match['hdr.ethernet.dst_addr'] = '00:00:00:00:00:1B'
+te.action['port_num'] = '4'
+te.insert()
+```
 
