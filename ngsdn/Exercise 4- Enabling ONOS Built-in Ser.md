@@ -14,7 +14,7 @@
 ### 2. Remove (set invalid) the cpu_out header
 ### 3. Exit the pipeline here (no need to go through other tables
 
-```
+```p4
 
 if (hdr.cpu_out.isValid()) {
             standard_metadata.egress_spec = hdr.cpu_out.egress_port;
@@ -27,7 +27,7 @@ if (hdr.cpu_out.isValid()) {
 ### 1. Set cpu_in header as valid
 ### 2. Set the cpu_in.ingress_port field to the original packet's ingress port (standard_metadata.ingress_port).
 
-```
+```p4
 
 if (standard_metadata.egress_port == CPU_PORT) {
             
@@ -42,12 +42,12 @@ if (standard_metadata.egress_port == CPU_PORT) {
 ## 2. Run PTF tests
 
 
-```
+```p4
 "egress_port": outport,
 
 ```
 
-```
+```p4
 self.insert(self.helper.build_table_entry(
             table_name="IngressPipeImpl.acl_table",
             match_fields={
@@ -61,7 +61,7 @@ self.insert(self.helper.build_table_entry(
 
 ```
 
-```
+```p4
 "ingress_port": outport,
 
 ```
