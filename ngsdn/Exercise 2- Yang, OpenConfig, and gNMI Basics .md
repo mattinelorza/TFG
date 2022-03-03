@@ -16,4 +16,15 @@ $ make yang-tools
 bash-4.4#
 
 ```
+
+
+## Understanding YANG encoding
+
+* se ha añadido un nuevo puerto de velocidad de 100GBps y se pueden observar cambios al ejecutar 
+
+```
+pyang -f dsdl
+
+``` 
+
 ### Falta continuar en el punto 3
