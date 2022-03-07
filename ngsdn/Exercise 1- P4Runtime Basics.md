@@ -3,6 +3,8 @@
 # He terminado el ejercicio aunque daba un error el .py al hacer el te.insert()
 * Está indicado al finall del documento
 
+# p4info.txt
+
 ## What is the fully qualified name of the l2_exact_table? What is its numeric ID?
 
 ```
