@@ -67,4 +67,4 @@ self.insert(self.helper.build_table_entry(
 ```
 
 
-* está dando un error ala ejecutar el test PTF en el packetOut
+* los test PTF han funcionado correctamente
