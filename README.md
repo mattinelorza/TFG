@@ -19,6 +19,6 @@ ngsdn
 
 * Tutorial 3 Finalizado
 
-* Tutorial 4 sin terminar y con fallo en el test
+* Tutorial 4 sin terminar y fallo del test arreglado
 
 * Turorial 5 falta empezar a modificar el código y volver a leerlo
