@@ -17,7 +17,7 @@ ngsdn
 
 * Tutorial 2 terminado
 
-* Tutorial 3 falta el 3. apartado
+* Tutorial 3 Finalizado
 
 * Tutorial 4 sin terminar y con fallo en el test
 
