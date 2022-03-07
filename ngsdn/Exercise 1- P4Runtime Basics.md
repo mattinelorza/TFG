@@ -42,6 +42,8 @@ bitwidth: 9
 * En el p4 info se hace referencia en la anotación a la cabecera del programa principal.
 
 
+## Insert P4Runtime table entries
+
 ```python
 te = table_entry['IngressPipeImpl.l2_exact_table'](action='IngressPipeImpl.set_egress_port')
 te.match['hdr.ethernet.dst_addr'] = '00:00:00:00:00:1A'
