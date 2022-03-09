@@ -21,4 +21,4 @@ ngsdn
 
 * Tutorial 4 sin terminar, parte 1 finalizada.
 
-* Turorial 5 falta empezar a modificar el código y volver a leerlo
+* Tutorial 5 falta empezar a modificar el código y volver a leerlo
