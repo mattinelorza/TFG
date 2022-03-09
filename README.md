@@ -13,9 +13,9 @@ p4Runtime leido
 
 ngsdn
 
-* Tutorial 1 falla añadir el puerto
+* Tutorial 1 error en el comando de los puertos
 
-* Tutorial 2 terminado
+* Tutorial 2 Finalizado
 
 * Tutorial 3 Finalizado
 
