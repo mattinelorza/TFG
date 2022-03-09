@@ -68,3 +68,28 @@ self.insert(self.helper.build_table_entry(
 
 
 * los test PTF han funcionado correctamente
+
+
+## 3. Modify ONOS pipeline interpreter
+
+* Únicamente hay que poner el ingress_port y el egress_port
+
+# COMANDOS INTERESANTES
+
+## Comandos dentro de la CLI de ONOS
+
+* Mostrar enlaces `links`
+* Mostrar dispositivos `devices - s`
+
+## Comandos dentro de el ONOS UI
+
+* Mostrar etiquetas de los dispositivos `L`
+* Hacer los hosts visibles `H`
+* Igualar roles de master `E`
+
+
+# PARTE 2 Host discovery & L2 bridging
+
+* Por comenzar
+
+
