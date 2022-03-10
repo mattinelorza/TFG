@@ -90,6 +90,6 @@ self.insert(self.helper.build_table_entry(
 
 # PARTE 2 Host discovery & L2 bridging
 
-* Por comenzar
 
+* En caso de que no funcione es importante volver a hacer el make netcfg
 
