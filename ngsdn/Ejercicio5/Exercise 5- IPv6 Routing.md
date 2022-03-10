@@ -29,3 +29,15 @@ satisfied:
 * Como es esperado tras hacer el ping no hay conectividad entre el h2 y el h3
 
 # Hay que modificar el programa P4
+
+* Parte del TODO del ejercicio 5 nos lo dan dentro de snippets.p4 con la acción `ndps_ns_to_na`
+
+# Piden lo siguiente
+
+This table should define a mapping between the interface IPv6 addresses provided
+in [netcfg.json](mininet/netcfg.json) and the `myStationMac` associated to each
+switch (also defined in netcfg.json). When an NDP NS packet is received, asking
+to resolve one of such IPv6 addresses, the `ndp_ns_to_na` action should be
+invoked with the given `myStationMac` as parameter. The ONOS app will be
+responsible of inserting entries in this table according to the content of
+netcfg.json.
