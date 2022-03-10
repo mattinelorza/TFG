@@ -93,3 +93,15 @@ self.insert(self.helper.build_table_entry(
 
 * En caso de que no funcione es importante volver a hacer el make netcfg
 
+* PASOS a seguir:
+`make app-build`
+`make app-reload`
+
+## Se pueden observar las reglas aplicadas de la siguiente manera desde la onos-cli
+* Para el leaf 1
+`flows -s any:device:leaf1`
+
+### Se verifica el correcto funcionamiento en el bridging l2 mediante un ping de h1a a h1b
+
+### Desde onos con el comando `hosts -s` se observa como hay 2 hosts tras el ping anterior, lo mismo desde el onos ui pulsando la tecla `H`
+
