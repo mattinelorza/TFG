@@ -21,4 +21,4 @@ ngsdn
 
 * Tutorial 4 Finalizado
 
-* Tutorial 5 falta empezar a modificar el código y volver a leerlo
+* Tutorial 5 Añadido snippets
