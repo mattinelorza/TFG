@@ -428,9 +428,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     //
     // 1. Create a table to to handle NDP messages to resolve the MAC address of
     //    switch. This table should:
-    //    - match on hdr.ndp.target_ipv6_addr (exact match)
-    //    - provide action "ndp_ns_to_na" (look in snippets.p4)
-    //    - default_action should be "NoAction"
+    //    - match on hdr.ndp.target_ipv6_addr (exact match) OK
+    //    - provide action "ndp_ns_to_na" (look in snippets.p4)  OK
+    //    - default_action should be "NoAction" OK
     //
     // 2. Create table to handle IPv6 routing. Create a L2 my station table (hit
     //    when Ethernet destination address is the switch address). This table
@@ -477,9 +477,11 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         actions={
 
             ndp_ns_to_na;
-
-            // el default action?
+            NoAction; 
+            
         }
+
+        default_action = NoAction();
         
     }
 
