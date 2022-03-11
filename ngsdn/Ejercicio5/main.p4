@@ -465,6 +465,36 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     standard_metadata.egress_spec = standard_metadata.ingress_port;
     }
 
+    //------- table para manejar mensajes ndp -------------
+
+    table ndp_mac_table{
+
+        key={
+
+             hdr.ndp.target_ipv6_addr : exact;
+        }
+
+        actions={
+
+            ndp_ns_to_na;
+
+            // el default action?
+        }
+        
+    }
+
+    //----- table para rutado ipv6 -----------------
+
+
+    table ipv6_routing_table{
+
+        key = {
+            // ni idea
+        }
+
+    }
+
+
 
     // *** TODO EXERCISE 6 (SRV6)
     //
@@ -550,6 +580,10 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Insert logic to match the My Station table and upon hit, the
             // routing table. You should also add a conditional to drop the
             // packet if the hop_limit reaches 0.
+
+
+
+            
 
             // *** TODO EXERCISE 6
             // Insert logic to match the SRv6 My SID and Transit tables as well
