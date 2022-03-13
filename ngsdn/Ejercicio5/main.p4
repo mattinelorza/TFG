@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include <core.p4>
 #include <v1model.p4>
 
@@ -449,7 +448,6 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
     // En snippets.p4 ya nos dan parte del codigo
 
-
     action ndp_ns_to_na(mac_addr_t target_mac) {
     hdr.ethernet.src_addr = target_mac;
     hdr.ethernet.dst_addr = IPV6_MCAST_01;
@@ -482,18 +480,40 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         }
 
         default_action = NoAction();
+        // porque en la solución pone lo del counter?
         
+    }
+
+    //----- table para manejo ipv6 -----------------
+
+
+    table ipv6_handle_table{
+
+        key = {
+            hdr.ethernet.dst_addr: exact;
+        }
+
+        actions={
+            NoAction;
+        }
+        // porque en la solución pone lo del counter?
+
     }
 
     //----- table para rutado ipv6 -----------------
 
-
     table ipv6_routing_table{
+//key = {
+//       hdr_field_1: lpm / exact / ternary;
+//       hdr_field_2: selector;
+//       hdr_field_3: selector;
+//       ...
+//   }
+//   actions = { ... }
+//   implementation = ecmp_selector;
+//   ...
 
-        key = {
-            // ni idea
-        }
-
+// Tiene que tener este tipo de estructura la tabla que me piden
     }
 
 
@@ -574,6 +594,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // If this is an NDP NS packet, i.e., if a matching entry is found,
             // unset the "do_l3_l2" flag to skip the L3 and L2 tables, as the
             // "ndp_ns_to_na" action already set an egress port.
+
+    
+
         }
 
         if (do_l3_l2) {
@@ -582,7 +605,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Insert logic to match the My Station table and upon hit, the
             // routing table. You should also add a conditional to drop the
             // packet if the hop_limit reaches 0.
-
+    
 
 
             
@@ -592,6 +615,12 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // as logic to perform PSP behavior. HINT: This logic belongs
             // somewhere between checking the switch's my station table and
             // applying the routing table.
+
+
+
+
+
+
 
             // L2 bridging logic. Apply the exact table first...
             if (!l2_exact_table.apply().hit) {
