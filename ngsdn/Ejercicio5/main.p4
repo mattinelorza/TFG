@@ -468,19 +468,17 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     table ndp_mac_table{
 
         key={
-
              hdr.ndp.target_ipv6_addr : exact;
         }
 
         actions={
-
             ndp_ns_to_na;
             NoAction; 
-            
         }
 
         default_action = NoAction();
-        // porque en la solución pone lo del counter?
+        @name("ndp_mac_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
         
     }
 
@@ -496,13 +494,48 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         actions={
             NoAction;
         }
-        // porque en la solución pone lo del counter?
+
+        @name("ipv6_handle_table_counter")
+        counters = direct_counter(CounterType.packets_and_bytes);
 
     }
 
     //----- table para rutado ipv6 -----------------
 
+    // ECMP action selector definition:
+    action_selector(HashAlgorithm.crc16, 32w1024, 32w16) ecmp_selector;
+
+    // Cogido del snipepets.p4
+
+    action next_hop(mac_addr_t dst_mac){
+        
+        hdr.ethernet.src_addr = hdr.ethernet.dst_addr;
+        hdr.ethernet.dst_addr =dst_mac;
+
+        //Hay que acordarse de decrementar el TTL !!!
+
+        hdr.ipv6.hop_limit =hdr.ipv6.hop_limit -1;
+
+
+    }
+
     table ipv6_routing_table{
+
+        key{
+            hdr.ipv6.dst_addr: exact; // en la solucion pone lpm, no sé si dará problema
+            hdr.ipv6.dst_addr: selector;
+            hdr.ipv6.src_addr: selector;
+            hdr.ipv6.flow_label: selector;
+        }
+
+        actions={
+            next_hop;
+        }
+
+        implementation= ecmp_selector;
+        @name("ipv6_routing_table_counter")
+        counters =direct_counter(CounterType.packets_and_bytes);
+        
 //key = {
 //       hdr_field_1: lpm / exact / ternary;
 //       hdr_field_2: selector;
