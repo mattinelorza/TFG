@@ -83,7 +83,7 @@ class IPv6RoutingTest(P4RuntimeTest):
             group_id=1,
             actions=[
                 # List of tuples (action name, action param dict)
-                ("IngressPipeImpl.set_next_hop", {"dst_mac": next_hop_mac}),
+                ("IngressPipeImpl.next_hop", {"dst_mac": next_hop_mac}),
             ]
         ))
         # ---- END SOLUTION ----

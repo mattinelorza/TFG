@@ -474,7 +474,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
         actions={
             ndp_ns_to_na;
-            NoAction; 
+            NoAction; //en la solución no sale esto
         }
 
         default_action = NoAction();
@@ -496,7 +496,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             NoAction;
         }
 
-        @name("ipv6_handle_table_counter")
+        @name("my_station_handle_table_counter")
         counters = direct_counter(CounterType.packets_and_bytes);
 
     }
