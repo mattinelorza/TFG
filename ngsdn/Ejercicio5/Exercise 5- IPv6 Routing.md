@@ -32,8 +32,10 @@ satisfied:
 
 * Parte del TODO del ejercicio 5 nos lo dan dentro de snippets.p4 con la acción `ndps_ns_to_na`
 
-# Piden lo siguiente
+# Errores en los test
 
+Could not find 'IngressPipeImpl.my_station table'
+Could not find 'IngressPipeImpl.ndp_reply_table'
 This table should define a mapping between the interface IPv6 addresses provided
 in [netcfg.json](mininet/netcfg.json) and the `myStationMac` associated to each
 switch (also defined in netcfg.json). When an NDP NS packet is received, asking
