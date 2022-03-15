@@ -610,6 +610,14 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // unset the "do_l3_l2" flag to skip the L3 and L2 tables, as the
             // "ndp_ns_to_na" action already set an egress port.
 
+            if(ndp_reply_table.apply().hit){
+
+                do_l3_l2 = false;
+
+            }
+
+            
+
             
         }
 
@@ -619,6 +627,17 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Insert logic to match the My Station table and upon hit, the
             // routing table. You should also add a conditional to drop the
             // packet if the hop_limit reaches 0.
+
+            if(hdr.ipv6.isValid && my_station_table.apply().hit){
+
+                 // habrá que comprobar que la cabecer ip es valida previamente
+
+                ipv6_routing_table.apply();
+
+                if(hdr.ipv6.hop_limit==0){
+                    drop();
+                }
+            }
 
 
 
