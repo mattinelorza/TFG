@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 #include <core.p4>
 #include <v1model.p4>
 
@@ -427,9 +428,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     //
     // 1. Create a table to to handle NDP messages to resolve the MAC address of
     //    switch. This table should:
-    //    - match on hdr.ndp.target_ipv6_addr (exact match) OK
-    //    - provide action "ndp_ns_to_na" (look in snippets.p4)  OK
-    //    - default_action should be "NoAction" OK
+    //    - match on hdr.ndp.target_ipv6_addr (exact match)
+    //    - provide action "ndp_ns_to_na" (look in snippets.p4)
+    //    - default_action should be "NoAction"
     //
     // 2. Create table to handle IPv6 routing. Create a L2 my station table (hit
     //    when Ethernet destination address is the switch address). This table
@@ -445,8 +446,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     // You can name your tables whatever you like. You will need to fill
     // the name in elsewhere in this exercise.
 
-
-    // En snippets.p4 ya nos dan parte del codigo
+     // En snippets.p4 ya nos dan parte del codigo
 
     action ndp_ns_to_na(mac_addr_t target_mac) {
     hdr.ethernet.src_addr = target_mac;
@@ -464,7 +464,8 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     }
 
     //------- table para manejar mensajes ndp -------------
-
+    
+    //equivalente a la my_station de la solución
     table ndp_mac_table{
 
         key={
@@ -535,26 +536,108 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         implementation= ecmp_selector;
         @name("ipv6_routing_table_counter")
         counters =direct_counter(CounterType.packets_and_bytes);
-        
-//key = {
-//       hdr_field_1: lpm / exact / ternary;
-//       hdr_field_2: selector;
-//       hdr_field_3: selector;
-//       ...
-//   }
-//   actions = { ... }
-//   implementation = ecmp_selector;
-//   ...
+ 
 
-// Tiene que tener este tipo de estructura la tabla que me piden
-    }
-
-
-
-    // *** TODO EXERCISE 6 (SRV6)
+    // ***  EXERCISE 6 (SRV6)
     //
     // Implement tables to provide SRV6 logic.
 
+    // --- srv6_my_sid----------------------------------------------------------
+
+    // Process the packet if the destination IP is the segemnt Id(sid) of this
+    // device. This table will decrement the "segment left" field from the Srv6
+    // header and set destination IP address to next segment.
+
+    action srv6_end() {
+        hdr.srv6h.segment_left = hdr.srv6h.segment_left - 1;
+        hdr.ipv6.dst_addr = local_metadata.next_srv6_sid;
+    }
+
+    direct_counter(CounterType.packets_and_bytes) srv6_my_sid_table_counter;
+    table srv6_my_sid {
+      key = {
+          hdr.ipv6.dst_addr: lpm;
+      }
+      actions = {
+          srv6_end;
+      }
+      counters = srv6_my_sid_table_counter;
+    }
+
+    // --- srv6_transit --------------------------------------------------------
+
+    // Inserts the SRv6 header to the IPv6 header of the packet based on the
+    // destination IP address.
+
+
+    action insert_srv6h_header(bit<8> num_segments) {
+        hdr.srv6h.setValid();
+        hdr.srv6h.next_hdr = hdr.ipv6.next_hdr;
+        hdr.srv6h.hdr_ext_len =  num_segments * 2;
+        hdr.srv6h.routing_type = 4;
+        hdr.srv6h.segment_left = num_segments - 1;
+        hdr.srv6h.last_entry = num_segments - 1;
+        hdr.srv6h.flags = 0;
+        hdr.srv6h.tag = 0;
+        hdr.ipv6.next_hdr = IP_PROTO_SRV6;
+    }
+
+    /*
+       Single segment header doesn't make sense given PSP
+       i.e. we will pop the SRv6 header when segments_left reaches 0
+     */
+
+    action srv6_t_insert_2(ipv6_addr_t s1, ipv6_addr_t s2) {
+        hdr.ipv6.dst_addr = s1;
+        hdr.ipv6.payload_len = hdr.ipv6.payload_len + 40;
+        insert_srv6h_header(2);
+        hdr.srv6_list[0].setValid();
+        hdr.srv6_list[0].segment_id = s2;
+        hdr.srv6_list[1].setValid();
+        hdr.srv6_list[1].segment_id = s1;
+    }
+
+    action srv6_t_insert_3(ipv6_addr_t s1, ipv6_addr_t s2, ipv6_addr_t s3) {
+        hdr.ipv6.dst_addr = s1;
+        hdr.ipv6.payload_len = hdr.ipv6.payload_len + 56;
+        insert_srv6h_header(3);
+        hdr.srv6_list[0].setValid();
+        hdr.srv6_list[0].segment_id = s3;
+        hdr.srv6_list[1].setValid();
+        hdr.srv6_list[1].segment_id = s2;
+        hdr.srv6_list[2].setValid();
+        hdr.srv6_list[2].segment_id = s1;
+    }
+
+    direct_counter(CounterType.packets_and_bytes) srv6_transit_table_counter;
+    table srv6_transit {
+      key = {
+          hdr.ipv6.dst_addr: lpm;
+          // TODO: what other fields do we want to match?
+      }
+      actions = {
+          srv6_t_insert_2;
+          srv6_t_insert_3;
+          // Extra credit: set a metadata field, then push label stack in egress
+      }
+      counters = srv6_transit_table_counter;
+    }
+
+    // Called directly in the apply block.
+    action srv6_pop() {
+      hdr.ipv6.next_hdr = hdr.srv6h.next_hdr;
+      // SRv6 header is 8 bytes
+      // SRv6 list entry is 16 bytes each
+      // (((bit<16>)hdr.srv6h.last_entry + 1) * 16) + 8;
+      bit<16> srv6h_size = (((bit<16>)hdr.srv6h.last_entry + 1) << 4) + 8;
+      hdr.ipv6.payload_len = hdr.ipv6.payload_len - srv6h_size;
+
+      hdr.srv6h.setInvalid();
+      // Need to set MAX_HOPS headers invalid
+      hdr.srv6_list[0].setInvalid();
+      hdr.srv6_list[1].setInvalid();
+      hdr.srv6_list[2].setInvalid();
+    }
 
     // *** ACL
     //
@@ -564,7 +647,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     // We use this table to clone all NDP packets to the control plane, so to
     // enable host discovery. When the location of a new host is discovered, the
     // controller is expected to update the L2 and L3 tables with the
-    // corresponding bridging and routing entries.
+    // correspionding brinding and routing entries.
 
     action send_to_cpu() {
         standard_metadata.egress_spec = CPU_PORT;
@@ -609,14 +692,9 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // 3. Exit the pipeline here (no need to go through other tables
 
             standard_metadata.egress_spec = hdr.cpu_out.egress_port;
-
             hdr.cpu_out.setInvalid();
-            
             exit;
         }
-
-
-
 
         bool do_l3_l2 = true;
 
@@ -628,8 +706,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // unset the "do_l3_l2" flag to skip the L3 and L2 tables, as the
             // "ndp_ns_to_na" action already set an egress port.
 
-    
-
+            
         }
 
         if (do_l3_l2) {
@@ -638,10 +715,11 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // Insert logic to match the My Station table and upon hit, the
             // routing table. You should also add a conditional to drop the
             // packet if the hop_limit reaches 0.
-    
 
 
-            
+
+
+
 
             // *** TODO EXERCISE 6
             // Insert logic to match the SRv6 My SID and Transit tables as well
@@ -649,11 +727,21 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // somewhere between checking the switch's my station table and
             // applying the routing table.
 
+            if (hdr.ipv6.isValid() && my_station_table.apply().hit) {
 
+                if (srv6_my_sid.apply().hit) {
+                    // PSP logic -- enabled for all packets
+                    if (hdr.srv6h.isValid() && hdr.srv6h.segment_left == 0) {
+                        srv6_pop();
+                    }
+                } else {
+                    srv6_transit.apply();
+                }
 
-
-
-
+                routing_v6_table.apply();
+                // Check TTL, drop packet if necessary to avoid loops.
+                if(hdr.ipv6.hop_limit == 0) { drop(); }
+            }
 
             // L2 bridging logic. Apply the exact table first...
             if (!l2_exact_table.apply().hit) {
@@ -684,10 +772,8 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
             //    ingress port (standard_metadata.ingress_port).
 
             hdr.cpu_in.setValid();
-
-            hdr.cpu_in.ingress_port = standard_metadata.ingress_port; // ojo que es la cabecera
-
-            exit; // IMPORTANTE EL EXIT
+            hdr.cpu_in.ingress_port = standard_metadata.ingress_port;
+            exit;
         }
 
         // If this is a multicast packet (flag set by l2_ternary_table), make
