@@ -36,10 +36,4 @@ satisfied:
 
 Could not find 'IngressPipeImpl.my_station table'
 Could not find 'IngressPipeImpl.ndp_reply_table'
-This table should define a mapping between the interface IPv6 addresses provided
-in [netcfg.json](mininet/netcfg.json) and the `myStationMac` associated to each
-switch (also defined in netcfg.json). When an NDP NS packet is received, asking
-to resolve one of such IPv6 addresses, the `ndp_ns_to_na` action should be
-invoked with the given `myStationMac` as parameter. The ONOS app will be
-responsible of inserting entries in this table according to the content of
-netcfg.json.
+
