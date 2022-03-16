@@ -32,9 +32,11 @@ satisfied:
 
 * Parte del TODO del ejercicio 5 nos lo dan dentro de snippets.p4 con la acción `ndps_ns_to_na`
 
-# Errores en los test
+## Errores previos en los test
 
 Could not find 'IngressPipeImpl.my_station table'
 
 Could not find 'IngressPipeImpl.ndp_reply_table'
+
+# SE HAN CORREGIDO Y EL CÓDIGO FUNCIONA CORRECTAMENTE
 
