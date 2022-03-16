@@ -628,7 +628,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             // routing table. You should also add a conditional to drop the
             // packet if the hop_limit reaches 0.
 
-            if(hdr.ipv6.isValid && my_station_table.apply().hit){
+            if(hdr.ipv6.isValid() && my_station_table.apply().hit){
 
                  // habrá que comprobar que la cabecer ip es valida previamente
 
