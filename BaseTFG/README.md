@@ -8,7 +8,7 @@ Rama int_fase1:
 
 Cualquier cambio en la maqueta requiere:
 
-   1. make p4-buid
+   1. make p4-build
    2. make app-build
 
 
