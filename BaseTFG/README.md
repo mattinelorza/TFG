@@ -4,12 +4,12 @@
 
 Rama int_fase1:
 
-(El historial de commits del desarrollo de esta fase se encuentran disponibles en el repositorio http://github.com/isabelplaza/PruebaINT.git)
+(El historial de commits del desarrollo de la fase previa se encuentran disponibles en el repositorio http://github.com/isabelplaza/PruebaINT.git)
 
 Cualquier cambio en la maqueta requiere:
 
    1. make p4-buid
-   2. make app-buid
+   2. make app-build
 
 
 Para arrancar la maqueta:
