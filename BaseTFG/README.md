@@ -58,7 +58,9 @@ Una vez arrancada la maqueta, ejecutar los comandos directamente en los hosts de
 
     cd <dir_raíz_repositorio>
     util/mn-cmd h2 python receive.py -c h2-eth0 # en un terminal
-    util/mn-cmd h1 python send.py -e 00:00:00:00:00:1a,00:00:00:00:00:1b -i 172.16.1.1,172.16.1.2,0 -p 3 -c h1-eth0 # en otro terminal
+    util/mn-cmd h1 python send.py -e 00:00:00:00:00:1a,00:00:00:00:00:1b -i 172.16.1.1,172.16.1.2,0 -p 7000 -c h1-eth0 # en otro terminal
+    util/mn-cmd h3 python send.py -e 00:00:00:00:00:1c,00:00:00:00:00:1c -i 172.16.1.3,172,16.1.2,0 -p 700 -c h3-eth0
+    
 
 //////////////////////////////////////////////////////////////
 
