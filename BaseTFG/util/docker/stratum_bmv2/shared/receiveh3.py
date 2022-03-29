@@ -136,7 +136,7 @@ def handle_pkt(packet, flows, counters):
         int_m.show()
 
         f.write("\n\nSwitch ID %d: " % (x+1))
-        f.write(str(int_m.sw_id))
+        f.write(str(int_m.switch_id)) #cambiado el m.sw_id
 
         f.write("\nEgress timestamp %d: " % (x+1))
         f.write(str(int_m.egress_timestamp))

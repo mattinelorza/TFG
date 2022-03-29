@@ -817,6 +817,7 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);
         packet.emit(hdr.icmp);
+        //packet.emit(hdr.sw_id); //para que salga el switch id 
     }
 }
 
