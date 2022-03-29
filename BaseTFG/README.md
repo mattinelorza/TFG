@@ -4,7 +4,7 @@
 
 Rama int_fase1:
 
-(El historial de commits del desarrollo de la fase previa se encuentran disponibles en el repositorio http://github.com/isabelplaza/PruebaINT.git)
+( El historial de commits del desarrollo de la fase previa se encuentran disponibles en el repositorio http://github.com/isabelplaza/PruebaINT.git )
 
 Cualquier cambio en la maqueta requiere:
 
@@ -22,7 +22,7 @@ Para arrancar la maqueta:
    4. mininet> h1 arp -i h1-eth0 -s 172.16.1.2 00:00:00:00:00:1B
       mininet> h2 arp -i h2-eth0 -s 172.16.1.1 00:00:00:00:00:1A
       mininet> h1 ping h2
-
+## puede que el ping no funcione ya que se han añadido cabeceras INT y el destinatario no reconozca ese formato nuevo de paquetes
 
 
 Para poder tener comunicación IPv6:
