@@ -1,6 +1,6 @@
 # TFG
 
-
+## TUTORIALES
 Basic.p4 terminado
 
 
@@ -11,7 +11,7 @@ Basic_tunnel.p4 falta el apartado del parser
 p4Runtime leido
 
 
-ngsdn
+### ngsdn
 
 * Tutorial 1 error en el comando de los puertos
 
@@ -22,3 +22,8 @@ ngsdn
 * Tutorial 4 Finalizado
 
 * Tutorial 5 Parte 1 terminada
+
+# MAQUETA
+
+* Docker configurado
+* INT no funciona
