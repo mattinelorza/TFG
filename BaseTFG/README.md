@@ -64,4 +64,6 @@ Una vez arrancada la maqueta, ejecutar los comandos directamente en los hosts de
 
 //////////////////////////////////////////////////////////////
 
+Para pasar de docker al pc local
+`docker exec 3a75e8b83993 cat timestamps_h1h2.txt > timestamps_100_20_h1h2`
 
