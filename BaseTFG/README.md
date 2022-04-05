@@ -70,5 +70,5 @@ Para pasar de docker al pc local
 ////////////////////////////////////////////////////////////
 
 Para capturar de manera adecuada 
-'./mn-cmd collector python receiveh1.py -c collector-eth0'`
+`./mn-cmd collector python receiveh1.py -c collector-eth0`
 
