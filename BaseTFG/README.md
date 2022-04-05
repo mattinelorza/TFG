@@ -72,4 +72,4 @@ Para pasar de docker al pc local
 Para capturar de manera adecuada 
 `./mn-cmd collector python receiveh1.py -c collector-eth0`
 
-`h1 ping -i 0.01 h2 -c 7000
+`h1 ping -i 0.01 h2 -c 7000`
