@@ -73,3 +73,4 @@ Para capturar de manera adecuada
 `./mn-cmd collector python receiveh1.py -c collector-eth0`
 
 `h1 ping -i 0.01 h2 -c 7000`
+* Hay que acordarse de meter con arp tambien el h3 para que funcione el ping
