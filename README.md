@@ -26,4 +26,6 @@ p4Runtime leido
 # MAQUETA
 
 * Docker configurado
-* INT no funciona
+* Comprobado que se consiguen velocidades de MB respecto a los KB obtenidos previamente.
+* Conseguido que se pongan bien los switch id.
+* INT no devuelve los retardos esperados
