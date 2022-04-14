@@ -12,10 +12,12 @@ arr = np.loadtxt(argv[1], dtype="int")
 print(arr)
 
 data = pd.DataFrame(arr)
-res = pd.DataFrame(data.values[::2]-data.values[1::2])
+res = pd.DataFrame(data.values[1::2]-data.values[::2])
 res2= res.astype(int)
 print(res2)
+
 
 np.savetxt("resultados.csv",res2.astype(int),fmt='%i')
 
 
+print(np.mean(res2))
