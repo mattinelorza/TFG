@@ -64,4 +64,13 @@ Una vez arrancada la maqueta, ejecutar los comandos directamente en los hosts de
 
 //////////////////////////////////////////////////////////////
 
+Para pasar de docker al pc local
+`docker exec 3a75e8b83993 cat timestamps_h1h2.txt > timestamps_100_20_h1h2`
 
+////////////////////////////////////////////////////////////
+
+Para capturar de manera adecuada 
+`./mn-cmd collector python receiveh1.py -c collector-eth0`
+
+`h1 ping -i 0.01 h2 -c 7000`
+* Hay que acordarse de meter con arp tambien el h3 para que funcione el ping
