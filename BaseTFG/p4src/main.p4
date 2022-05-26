@@ -56,9 +56,10 @@ const bit<8> IP_PROTO_UDP    = 17;
 const bit<8> IP_PROTO_SRV6   = 43;
 const bit<8> IP_PROTO_ICMPV6 = 58;
 const bit<8> IP_PROTO_INT    = 0xFE; //use a value that is not used by any other protocol
+const bit<8> IP_PROTO_CAMINO = 0XFC; // para el camino
 
 const mac_addr_t IPV6_MCAST_01 = 0x33_33_00_00_00_01;
-const mac_addr_t MAC_DST_H2 = 0x00_00_00_00_00_1B;
+const mac_addr_t MAC_DST_H2 = 0x00_00_00_00_00_1B; 
 
 const bit<8> ICMP6_TYPE_NS = 135;
 const bit<8> ICMP6_TYPE_NA = 136;
@@ -170,6 +171,10 @@ header int_header_t {  //multiple of 8 size
     bit<32>   max_hop_cnt;       //maximun hop permitted
     bit<32>   total_hop_cnt;     //current number of hops
     bit<8>    instruction_mask;  //INT instructions
+}
+
+header camino_t {
+    bit<32>    camino;
 }
 
 /*
@@ -744,7 +749,7 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
             hdr.int_metadata.setInvalid();
             hdr.int_header.setInvalid();
 
-            hdr.ipv4.protocol = IP_PROTO_TCP;
+            hdr.ipv4.protocol = IP_PROTO_TCP; // entiendo que habria que cambiar este parametro para que reconozca los pings
 
         }
 
@@ -817,7 +822,7 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);
         packet.emit(hdr.icmp);
-        //packet.emit(hdr.sw_id); //para que salga el switch id 
+        packet.emit(hdr.sw_id); //para que salga el switch id 
     }
 }
 

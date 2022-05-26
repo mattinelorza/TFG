@@ -185,7 +185,7 @@ def main():
     print("sniffing on %s" % args.interface)
     sys.stdout.flush()
     sniff(
-        lfilter = lambda d: d.src == '00:00:00:00:00:1b',  # MAC del host origen
+        lfilter = lambda d: d.src == '00:00:00:00:00:1d',  # MAC del host origen
         iface = args.interface,
         prn = lambda x: handle_pkt(x, flows, counters))
 

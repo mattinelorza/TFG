@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import sys, os , socket, random, struct, time
 import argparse
 
@@ -30,7 +31,7 @@ parser.add_argument('-r', '--randbytes', const=True, action='store_const',  help
 parser.add_argument('-f', '--filename', type=str, help='Path for the filename')
 parser.add_argument('-c', '--interface', type=str, help='Name of the interface to send the packet to')
 parser.add_argument('-n', '--int', type=str, help='Add INT header')
-parser.add_argument('-ca','--camino', type=int, help='Choose fastest path')
+parser.add_argument('-l','--camino', type=int, help='Choose fastest path')
 
 
 args = parser.parse_args()
@@ -96,7 +97,7 @@ def main():
     #    pkt = pkt / INT_METADATA(sw_id=5, egress_timestamp=12345)
 
     if args.camino:
-        pkt = pkt / CAMINO(camino= # selección del correcto)
+        pkt = pkt / CAMINO(camino=args.camino) # selección del correcto)
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)
