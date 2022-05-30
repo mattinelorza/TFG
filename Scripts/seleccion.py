@@ -1,7 +1,7 @@
 # Script para tomar decisiones acerca de que camino escoger
 # Author: MATTIN A. ELORZA FORCADA
 
-from decimal import Subnormal
+#from decimal import Subnormal
 from sys import argv
 import numpy as np
 import subprocess

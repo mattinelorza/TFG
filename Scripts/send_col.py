@@ -45,23 +45,23 @@ class MPLS(Packet):
         ByteField("ttl", 0)
     ]
 
-class INT_HEADER(Packet):
-    name = "INT_HEADER"
-    fields_desc = [
-        BitField("ver", 1, 8), #name, default, size
-        BitField("max_hop_cnt", 1, 32),
-        BitField("total_hop_cnt", 2, 32),
-        BitField("instruction_mask", 1, 8)
-    ]
+#class INT_HEADER(Packet):
+#    name = "INT_HEADER"
+#    fields_desc = [
+#       BitField("ver", 1, 8), #name, default, size
+#       BitField("max_hop_cnt", 1, 32),
+#       BitField("total_hop_cnt", 2, 32),
+#       BitField("instruction_mask", 1, 8)
+#    ]
 
-class INT_METADATA(Packet):
-    name = "INT_METADATA"
-    fields_desc = [
-        BitField("sw_id", 0, 32),
-        BitField("egress_timestamp", 0, 48)
-    ]
+#class INT_METADATA(Packet):
+#   name = "INT_METADATA"
+#    fields_desc = [
+#       BitField("sw_id", 0, 32),
+#       BitField("egress_timestamp", 0, 48)
+#   ]
 
-class CAMINO(Packet):
+class CAMINO_HEADER(Packet):
     name="CAMINO"
     fields_desc = [
         BitField("camino", 1, 32)
@@ -71,7 +71,7 @@ class CAMINO(Packet):
 
 bind_layers(Ether, IP, type=0x0800)
 #bind_layers(IP, INT, protocol=0xFE)
-bind_layers(IP, CAMINO, type=0xFC)
+bind_layers(IP, CAMINO_HEADER, type=0xFD)
 
 def main():
 
@@ -97,7 +97,7 @@ def main():
     #    pkt = pkt / INT_METADATA(sw_id=5, egress_timestamp=12345)
 
     if args.camino:
-        pkt = pkt / CAMINO(camino=args.camino) # selección del correcto)
+        pkt = pkt / CAMINO_HEADER(camino=args.camino) # selección del correcto)
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import sys, os, socket, random, struct, time
 import binascii, uuid, json
 from datetime import datetime
@@ -25,7 +26,9 @@ LABEL1 = 1
 ICMP_PROTO = 1
 TCP_PROTO = 6
 UDP_PROTO = 17
+CAMINO_PROTO = 0XFD
 INT_PROTO = 0xFE
+
 
 parser = argparse.ArgumentParser(description='Process some parameters')
 
@@ -40,7 +43,7 @@ parser.add_argument('-r', '--randbytes', const=True, action='store_const',  help
 parser.add_argument('-f', '--filename', type=str, help='Path for the filename')
 parser.add_argument('-x', '--filter', type=str, help='Filter criteria')
 parser.add_argument('-c', '--interface', type=str, help='Name of the interface to send the packet to')
-#parser.add_argument('-n', '--int', type=str, help='INT header')
+#parser.add_argument('-n', '--int', type=str, help='INT header') NOT USED FROM COLLECTOR TO H1
 
 args = parser.parse_args()
 
@@ -70,10 +73,10 @@ class MPLS(Packet):
 #        BitField("egress_timestamp", 0, 48)
 #    ]
 
-class CAMINO(Packet):
+class CAMINO_HEADER(Packet):
     name = "CAMINO"
     fields_desc = [
-        BitField("camino", 1, 32)
+        BitField("camino", 1, 8)
 
     ]
 
@@ -81,7 +84,7 @@ class CAMINO(Packet):
 bind_layers(Ether, IP, type=0x0800)
 #bind_layers(IP, INT_HEADER, protocol=INT_PROTO)
 #bind_layers(INT_HEADER, INT_METADATA)
-bind_layers(IP,CAMINO, type=0xFC)
+bind_layers(IP,CAMINO_HEADER, protocol=CAMINO_PROTO)
 
 #para leer las interfaces
 def get_if():
@@ -134,8 +137,8 @@ def handle_pkt(packet, flows, counters):
     #int_h = INT_HEADER(pkt[INT_HEADER_OFFSET:(INT_HEADER_OFFSET+INT_HEADER_LENGTH)])
     #int_h.show()
 
-    camino_m = CAMINO(pkt[CAMINO_OFFSET:(CAMINO_OFFSET+CAMINO_LENGTH)])
-    camino_m.show
+    camino_h = CAMINO_HEADER(pkt[CAMINO_OFFSET:(CAMINO_OFFSET+CAMINO_LENGTH)])
+    camino_h.show()
 
     ##f = open('int_data_h1h2.txt', 'a')
     ##f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
@@ -170,7 +173,7 @@ def handle_pkt(packet, flows, counters):
     f = open ('camino.txt', 'a')
     f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
     f.write("\nThis is the fastest link\n")
-    f.write(str(camino_m.camino))
+    f.write(str(camino_h.camino))
     f.write("////////////////////////////////////////////////////////////////////////")
 
 
@@ -185,7 +188,7 @@ def main():
     print("sniffing on %s" % args.interface)
     sys.stdout.flush()
     sniff(
-        lfilter = lambda d: d.src == '00:00:00:00:00:1d',  # MAC del host origen
+        lfilter = lambda d: d.src == '00:00:00:00:00:1D',  # MAC del host origen
         iface = args.interface,
         prn = lambda x: handle_pkt(x, flows, counters))
 
