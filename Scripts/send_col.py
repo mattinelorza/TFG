@@ -64,7 +64,8 @@ class MPLS(Packet):
 class CAMINO_HEADER(Packet):
     name="CAMINO"
     fields_desc = [
-        BitField("camino", 1, 32)
+        BitField("sw_id", 1, 32),
+        BitField("camino", 1, 48)
 
     ]
 
