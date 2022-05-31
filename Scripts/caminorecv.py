@@ -55,29 +55,12 @@ class MPLS(Packet):
         BitField("bos", 1, 1),
         ByteField("ttl", 0)
     ]
-#
-#
-#class INT_HEADER(Packet):
-#    name = "INT_HEADER"
-#    fields_desc = [
-#        BitField("ver", 1, 8), #name, default, size
-#        BitField("max_hop_cnt", 1, 32),
-#        BitField("total_hop_cnt", 2, 32),
-#        BitField("instruction_mask", 1, 8)
-#    ]
-#
-#class INT_METADATA(Packet):
-#    name = "INT_METADATA"
-#    fields_desc = [
-#        BitField("sw_id", 0, 32),
-#        BitField("egress_timestamp", 0, 48)
-#    ]
 
 class CAMINO_HEADER(Packet):
     name = "CAMINO"
     fields_desc = [
         BitField("sw_id", 0, 32),
-        BitField("camino", 1, 48)
+        BitField("path", 1, 48)
 
     ]
 
@@ -123,58 +106,29 @@ def handle_pkt(packet, flows, counters):
     #TCP_HEADER_LENGTH = 20
     #INT_HEADER_LENGTH = 10 # 10 byte = 80 bits
     #INT_METADATA_LENGTH = 10 # 10 bytes = 80 bits
-    CAMINO_LENGTH = 4 # 4 bytes = 32 bits
+    CAMINO_LENGTH = 10 # 8 bytes = 80 bits
 
 
     ETHERNET_OFFSET = 0 + ETHERNET_HEADER_LENGTH
     CAMINO_OFFSET = ETHERNET_OFFSET + CAMINO_LENGTH
-    #INT_HEADER_OFFSET = ETHERNET_OFFSET + IP_HEADER_LENGTH
-    #INT_METADATA_OFFSET = INT_HEADER_OFFSET + INT_HEADER_LENGTH
+    
     
 
     eth_h = Ether(pkt[0:ETHERNET_OFFSET])
     eth_h.show()
 
-    #int_h = INT_HEADER(pkt[INT_HEADER_OFFSET:(INT_HEADER_OFFSET+INT_HEADER_LENGTH)])
-    #int_h.show()
 
     camino_h = CAMINO_HEADER(pkt[CAMINO_OFFSET:(CAMINO_OFFSET+CAMINO_LENGTH)])
     camino_h.show()
 
-    ##f = open('int_data_h1h2.txt', 'a')
-    ##f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
-    ##f.write("\nThis is the INT data collected from the traffic flow between h1 and h2.\n")
-#
-    #ft = open('timestamps_h1h2.txt', 'a')
-#
-    #for x in range(0, int_h.total_hop_cnt):
-#
-    #    int_m = INT_METADATA(pkt[INT_METADATA_OFFSET:(INT_METADATA_OFFSET+INT_METADATA_LENGTH)])
-    #    int_m.show()
-#
-    #    f.write("\n\nSwitch ID %d: " % (x+1))
-    #    f.write(str(int_m.sw_id))
-#
-    #    f.write("\nEgress timestamp %d: " % (x+1))
-    #    f.write(str(int_m.egress_timestamp))
-    #    f.write("\n")
-    #    f.write("////////////////////////////////////////////////////////////////////////")
-#
-    #    ft.write(str(int_m.egress_timestamp))
-    #    ft.write("\n")
-#
-    #    INT_METADATA_OFFSET = INT_METADATA_OFFSET + INT_METADATA_LENGTH
-#
-#
-    #f.close()
-    #ft.close()
-    #sys.stdout.flush()
+ 
+
 
 
     f = open ('camino.txt', 'a')
     f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
     f.write("\nThis is the fastest link\n")
-    f.write(str(camino_h.camino))
+    f.write(str(camino_h.path))
     f.write("////////////////////////////////////////////////////////////////////////")
 
 
