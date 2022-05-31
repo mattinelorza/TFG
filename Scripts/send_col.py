@@ -51,7 +51,7 @@ class CAMINO_HEADER(Packet):
     name="CAMINO"
     fields_desc = [
         BitField("sw_id", 1, 32),
-        BitField("camino", 1, 48)
+        BitField("path", 1, 48)
 
     ]
 
@@ -79,7 +79,7 @@ def main():
 
    
     if args.path:
-        pkt = pkt / CAMINO_HEADER(camino=args.camino) # selección del correcto
+        pkt = pkt / CAMINO_HEADER(path=args.path) # selección del correcto
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)
