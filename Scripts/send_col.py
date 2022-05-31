@@ -31,7 +31,7 @@ parser.add_argument('-r', '--randbytes', const=True, action='store_const',  help
 parser.add_argument('-f', '--filename', type=str, help='Path for the filename')
 parser.add_argument('-c', '--interface', type=str, help='Name of the interface to send the packet to')
 parser.add_argument('-n', '--int', type=str, help='Add INT header')
-parser.add_argument('-l','--camino', type=int, help='Choose fastest path')
+parser.add_argument('-l','--path', type=int, help='Choose fastest path')
 
 
 args = parser.parse_args()
@@ -45,21 +45,7 @@ class MPLS(Packet):
         ByteField("ttl", 0)
     ]
 
-#class INT_HEADER(Packet):
-#    name = "INT_HEADER"
-#    fields_desc = [
-#       BitField("ver", 1, 8), #name, default, size
-#       BitField("max_hop_cnt", 1, 32),
-#       BitField("total_hop_cnt", 2, 32),
-#       BitField("instruction_mask", 1, 8)
-#    ]
 
-#class INT_METADATA(Packet):
-#   name = "INT_METADATA"
-#    fields_desc = [
-#       BitField("sw_id", 0, 32),
-#       BitField("egress_timestamp", 0, 48)
-#   ]
 
 class CAMINO_HEADER(Packet):
     name="CAMINO"
@@ -71,7 +57,6 @@ class CAMINO_HEADER(Packet):
 
 
 bind_layers(Ether, IP, type=0x0800)
-#bind_layers(IP, INT, protocol=0xFE)
 bind_layers(IP, CAMINO_HEADER, type=0xFD)
 
 def main():
@@ -84,7 +69,6 @@ def main():
 
 
 
-    #outF = open(fileName, "a")
 
     print("Sending packets on interface %s" % (args.interface))
 
@@ -93,12 +77,9 @@ def main():
     pkt = pkt / IP(src=ipParams[SRC], dst=ipParams[DST], tos=int(ipParams[DSCP], 0) << 2)
 
 
-    #if args.int:
-    #    pkt = pkt / INT_HEADER(ver=2, max_hop_cnt=3, total_hop_cnt=1, instruction_mask=3)
-    #    pkt = pkt / INT_METADATA(sw_id=5, egress_timestamp=12345)
-
-    if args.camino:
-        pkt = pkt / CAMINO_HEADER(camino=args.camino) # selección del correcto)
+   
+    if args.path:
+        pkt = pkt / CAMINO_HEADER(camino=args.camino) # selección del correcto
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)
@@ -112,8 +93,7 @@ def main():
             pkt = pkt / Raw(load=bytearray([0] * args.bytes) )
 
     for i in range(args.packets):    
-        #pkt.show()
-        #t = time.time_ns()
+        
         if args.udp:
             pkt[UDP].sport = i+1
 
