@@ -784,7 +784,7 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
 
         //////////////////////
 
-        if(local_metadata.sw_id == 1 && standard_metadata.egress_port == 1 ){
+        if(local_metadata.sw_id == 1 && standard_metadata.egress_port == 3 ){
             send_to_cpu();
             clone_to_cpu();
             hdr.camino_header.setInvalid();
