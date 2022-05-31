@@ -400,7 +400,7 @@ parser ParserImpl (packet_in packet,
 
     state parse_camino {
         packet.extract(hdr.camino_header);
-        bit<32> camino = hdr.camino_header.camino;
+        bit<48> camino = hdr.camino_header.camino;
         local_metadata.is_camino = true;
         transition accept;
 
@@ -763,7 +763,7 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
         if(hdr.ipv4.isValid() && !local_metadata.is_camino && (hdr.ethernet.dst_addr == MAC_DST_H1 || hdr.ethernet.dst_addr == MAC_DST_H3)){
             hdr.camino_header.setValid();
             hdr.camino_header.switch_id = local_metadata.sw_id; // Set switch ID
-            hdr.camino_header.camino = 1; // PRUEBA PARA QUE EL CAMINO POR DEFECTO SEA EL 1
+            // hdr.camino_header.camino = 1; // PRUEBA PARA QUE EL CAMINO POR DEFECTO SEA EL 1
             hdr.ipv4.protocol = IP_PROTO_CAMINO; // SET INT AS NEXT PROTOCOL
             send_to_cpu();
             clone_to_cpu();
