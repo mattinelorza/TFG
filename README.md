@@ -28,4 +28,6 @@ p4Runtime leido
 * Docker configurado
 * Comprobado que se consiguen velocidades de MB respecto a los KB obtenidos previamente.
 * Conseguido que se pongan bien los switch id.
-* INT no devuelve los retardos esperados
+* Comparación de retardos entre rutas OK.
+* Selección de la ruta óptima OK.
+* Generación de paquetes con path_header desde el colector OK.
