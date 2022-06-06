@@ -403,7 +403,7 @@ parser ParserImpl (packet_in packet,
 
     state parse_path {
         packet.extract(hdr.path_header);
-        bit<48> path_id = hdr.path_header.path_id;
+        //bit<48> path_id = hdr.path_header.path_id;
         local_metadata.is_path = true;
         transition accept;
 
@@ -464,6 +464,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
      table l2_exact_table {
         key = {
             hdr.ethernet.dst_addr: exact;
+            local_metadata.path_id: exact;
         }
 
         actions = {
@@ -669,15 +670,16 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
         local_metadata.path_id = DEFAULT_ROUTE;
 
          if(hdr.ipv4.isValid() && hdr.ethernet.src_addr == MAC_SRC_COLLECTOR ){
-            hdr.path_header.setValid();
-            hdr.path_header.switch_id = local_metadata.sw_id; // Set switch ID
-            hdr.path_header.path_id = local_metadata.path_id;
-            //hdr.path_header.path = 1; // PRUEBA PARA QUE EL path POR DEFECTO SEA EL 1
+            // hdr.path_header.setValid();
+            // hdr.path_header.switch_id = local_metadata.sw_id; // Set switch ID
+            // hdr.path_header.path_id = local_metadata.path_id;
+            // hdr.path_header.path = 1; // PRUEBA PARA QUE EL path POR DEFECTO SEA EL 1
             hdr.ipv4.protocol = IP_PROTO_PATH; // SET path AS NEXT PROTOCOL
 
             if(local_metadata.sw_id == 1){
                 hdr.path_header.setInvalid();
                 hdr.ipv4.protocol=IP_PROTO_TCP;
+                mark_to_drop(standard_metadata); // prueba para qumark_to_e no salga icmp
 
             }
 

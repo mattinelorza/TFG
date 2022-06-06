@@ -13,6 +13,12 @@ tables {
     bitwidth: 48
     match_type: EXACT
   }
+  match_fields {
+    id: 2
+    name: "local_metadata.path_id"
+    bitwidth: 48
+    match_type: EXACT
+  }
   action_refs {
     id: 16812802
   }
