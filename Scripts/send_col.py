@@ -31,7 +31,7 @@ parser.add_argument('-r', '--randbytes', const=True, action='store_const',  help
 parser.add_argument('-f', '--filename', type=str, help='Path for the filename')
 parser.add_argument('-c', '--interface', type=str, help='Name of the interface to send the packet to')
 parser.add_argument('-n', '--int', type=str, help='Add INT header')
-parser.add_argument('-l', '--path', type=str, help='Choose fastest path')
+parser.add_argument('-l', '--path', type=int, help='Choose fastest path')
 
 
 args = parser.parse_args()
@@ -48,16 +48,16 @@ class MPLS(Packet):
 
 
 class CAMINO_HEADER(Packet):
-    name="CAMINO"
+    name="CAMINO_HEADER"
     fields_desc = [
         BitField("sw_id", 1, 32),
-        BitField("path", 1, 48)
+        BitField("camino", 1, 48)
 
     ]
 
 
 bind_layers(Ether, IP, type=0x0800)
-bind_layers(IP, CAMINO_HEADER, type=0xFD)
+bind_layers(IP, CAMINO_HEADER, protocol=0xFD)
 
 def main():
 
@@ -79,7 +79,7 @@ def main():
 
    
     if args.path:
-        pkt = pkt / CAMINO_HEADER(path=args.path) # selección del correcto
+        pkt = pkt / CAMINO_HEADER(camino=args.path) # selección del correcto
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)
