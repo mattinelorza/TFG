@@ -76,7 +76,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Streams.stream;
 import static org.onosproject.ngsdn.tutorial.AppConstants.INITIAL_SETUP_DELAY;
@@ -194,7 +196,7 @@ public class Ipv6SimpleRoutingComponent {
      * @param nexthopMac the next hop (destination) mac
      * @param outPort    the output port
      */
-    private FlowRule createL2NextHopRule(DeviceId deviceId, MacAddress nexthopMac,
+    private FlowRule createL2NextHopRule(DeviceId deviceId, MacAddress nexthopMac, byte id,
                                          PortNumber outPort) {
 
         // *** TODO EXERCISE 5
@@ -205,6 +207,8 @@ public class Ipv6SimpleRoutingComponent {
         final PiCriterion match = PiCriterion.builder()
                 .matchExact(PiMatchFieldId.of("hdr.ethernet.dst_addr"),
                         nexthopMac.toBytes())
+                .matchExact(PiMatchFieldId.of("local_metadata.path_id"),
+                        id)
                 .build();
 
 
@@ -327,16 +331,24 @@ public class Ipv6SimpleRoutingComponent {
 
 
     /**
-     * Selects a path from the given set that does not lead back to the
+     * Selects two paths from the given set that do not lead back to the
      * specified port if possible.
      */
-    private Path pickForwardPathIfPossible(Set<Path> paths, PortNumber notToPort) {
+    private Set<Path> pickForwardPathIfPossible(Set<Path> paths, PortNumber notToPort) {
         log.info("PICK FORWARD PATH: Paths size: {}", paths.size());
+        
+        Set<Path> alternate_paths = new HashSet<Path>();
         for (Path path : paths) {
+            log.info("Path src: {}",path.src());
             if (!path.src().port().equals(notToPort)) {
-                return path;
+                alternate_paths.add(path);
             }
         }
+        if (alternate_paths.size()>1) {
+            return alternate_paths;
+            
+        }
+        log.warn("Path size is less than 2, no routes are installed");
         return null;
     }
 
@@ -349,7 +361,7 @@ public class Ipv6SimpleRoutingComponent {
         if (src.location().deviceId().toString().equals(dst.location().deviceId().toString())) {
             PortNumber outPort = dst.location().port();
             DeviceId devId = dst.location().deviceId();
-            FlowRule nextHopRule = createL2NextHopRule(devId, dst.mac(), outPort);
+            FlowRule nextHopRule = createL2NextHopRule(devId, dst.mac(), (byte)0,outPort);
             flowRuleService.applyFlowRules(nextHopRule);
             log.info("Hosts in the same switch");
             return;
@@ -357,9 +369,10 @@ public class Ipv6SimpleRoutingComponent {
 
         // Get all the available paths between two given hosts
         // A path is a collection of links
-        Set<Path> paths = topologyService.getPaths(topologyService.currentTopology(),
+        Stream<Path> paths_stream = topologyService.getKShortestPaths(topologyService.currentTopology(),
                 src.location().deviceId(),
                 dst.location().deviceId());
+        Set<Path> paths = paths_stream.collect(Collectors.toSet());
         if (paths.isEmpty()) {
             // If there are no paths, display a warn and exit
             log.warn("No path found");
@@ -368,27 +381,31 @@ public class Ipv6SimpleRoutingComponent {
 
         // Pick a path that does not lead back to where we
         // came from; if no such path,display a warn and exit
-        Path path = pickForwardPathIfPossible(paths, src.location().port());
-        if (path == null) {
+        Set<Path> alternate_paths = pickForwardPathIfPossible(paths, src.location().port());
+        if (alternate_paths == null) {
             log.warn("Don't know where to go from here {} for {} -> {}",
                     src.location(), srcId, dstId);
             return;
         }
-
-        // Install rules in the path
-        List<Link> pathLinks = path.links();
-        for (Link l : pathLinks) {
-            PortNumber outPort = l.src().port();
-            DeviceId devId = l.src().deviceId();
-            FlowRule nextHopRule = createL2NextHopRule(devId,dst.mac(),outPort);
+        byte id = 0;
+        for (Path path : alternate_paths) {
+            // Install rules in the path
+            
+            List<Link> pathLinks = path.links();
+            for (Link l : pathLinks) {
+                PortNumber outPort = l.src().port();
+                DeviceId devId = l.src().deviceId();
+                FlowRule nextHopRule = createL2NextHopRule(devId,dst.mac(),id,outPort);
+                flowRuleService.applyFlowRules(nextHopRule);
+            }
+            // Install rule in the last device (where dst is located)
+            PortNumber outPort = dst.location().port();
+            DeviceId devId = dst.location().deviceId();
+            FlowRule nextHopRule = createL2NextHopRule(devId,dst.mac(),id,outPort);
             flowRuleService.applyFlowRules(nextHopRule);
-        }
-        // Install rule in the last device (where dst is located)
-        PortNumber outPort = dst.location().port();
-        DeviceId devId = dst.location().deviceId();
-        FlowRule nextHopRule = createL2NextHopRule(devId,dst.mac(),outPort);
-        flowRuleService.applyFlowRules(nextHopRule);
+            id = (byte) (id+1);
 
+        }
     }
 
     /*
