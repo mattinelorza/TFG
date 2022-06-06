@@ -387,7 +387,7 @@ public class Ipv6SimpleRoutingComponent {
                     src.location(), srcId, dstId);
             return;
         }
-        byte id = 0;
+        byte id = 1;
         for (Path path : alternate_paths) {
             // Install rules in the path
             
@@ -522,8 +522,8 @@ public class Ipv6SimpleRoutingComponent {
 
         //setUpLongerPath(h3Id, collectorId);
         //setUpLongerPath(collectorId, h3Id);
-        setUpPath(h3Id, collectorId);
-        setUpPath(collectorId, h3Id);
+        setUpPath(h1Id, collectorId);
+        setUpPath(collectorId, h1Id);
         
 
         // Set switches' IDs

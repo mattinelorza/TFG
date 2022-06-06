@@ -1,8 +1,8 @@
 org/onosproject/ngsdn/tutorial/L2BridgingComponent.class
 org/onosproject/ngsdn/tutorial/cli/Srv6ClearCommand.class
 org/onosproject/ngsdn/tutorial/Ipv6SimpleRoutingComponent$InternalTopologyListener.class
-org/onosproject/ngsdn/tutorial/Srv6Component.class
 org/onosproject/ngsdn/tutorial/pipeconf/PipeconfLoader.class
+org/onosproject/ngsdn/tutorial/Srv6Component.class
 org/onosproject/ngsdn/tutorial/common/Utils.class
 org/onosproject/ngsdn/tutorial/Ipv6SimpleRoutingComponent.class
 org/onosproject/ngsdn/tutorial/Ipv6RoutingComponent$InternalDeviceListener.class
@@ -11,8 +11,8 @@ org/onosproject/ngsdn/tutorial/MainComponent$1.class
 org/onosproject/ngsdn/tutorial/NdpReplyComponent$1.class
 org/onosproject/ngsdn/tutorial/Ipv6RoutingComponent$1.class
 org/onosproject/ngsdn/tutorial/cli/Srv6SidCompleter.class
-org/onosproject/ngsdn/tutorial/NdpReplyComponent$InternalDeviceListener.class
 org/onosproject/ngsdn/tutorial/pipeconf/InterpreterImpl.class
+org/onosproject/ngsdn/tutorial/NdpReplyComponent$InternalDeviceListener.class
 org/onosproject/ngsdn/tutorial/Srv6Component$1.class
 org/onosproject/ngsdn/tutorial/cli/Srv6InsertCommand.class
 org/onosproject/ngsdn/tutorial/L2BridgingComponent$InternalHostListener.class
