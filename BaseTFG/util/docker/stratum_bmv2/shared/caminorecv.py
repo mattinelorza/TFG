@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys, os, socket, random, struct, time
 import binascii, uuid, json
 from datetime import datetime
@@ -25,7 +27,9 @@ LABEL1 = 1
 ICMP_PROTO = 1
 TCP_PROTO = 6
 UDP_PROTO = 17
+CAMINO_PROTO = 0XFD
 INT_PROTO = 0xFE
+
 
 parser = argparse.ArgumentParser(description='Process some parameters')
 
@@ -40,7 +44,7 @@ parser.add_argument('-r', '--randbytes', const=True, action='store_const',  help
 parser.add_argument('-f', '--filename', type=str, help='Path for the filename')
 parser.add_argument('-x', '--filter', type=str, help='Filter criteria')
 parser.add_argument('-c', '--interface', type=str, help='Name of the interface to send the packet to')
-#parser.add_argument('-n', '--int', type=str, help='INT header')
+#parser.add_argument('-n', '--int', type=str, help='INT header') NOT USED FROM COLLECTOR TO H1
 
 args = parser.parse_args()
 
@@ -54,27 +58,19 @@ class MPLS(Packet):
     ]
 
 
-class INT_HEADER(Packet):
-    name = "INT_HEADER"
-    fields_desc = [
-        BitField("ver", 1, 8), #name, default, size
-        BitField("max_hop_cnt", 1, 32),
-        BitField("total_hop_cnt", 2, 32),
-        BitField("instruction_mask", 1, 8)
-    ]
-
-class INT_METADATA(Packet):
-    name = "INT_METADATA"
+class CAMINO_HEADER(Packet):
+    name = "CAMINO"
     fields_desc = [
         BitField("sw_id", 0, 32),
-        BitField("egress_timestamp", 0, 48)
-    ]
+        BitField("camino", 1, 48)
 
+    ]
 
 
 bind_layers(Ether, IP, type=0x0800)
-bind_layers(IP, INT_HEADER, protocol=INT_PROTO)
-bind_layers(INT_HEADER, INT_METADATA)
+#bind_layers(IP, INT_HEADER, protocol=INT_PROTO)
+#bind_layers(INT_HEADER, INT_METADATA)
+bind_layers(IP,CAMINO_HEADER, protocol=CAMINO_PROTO)
 
 #para leer las interfaces
 def get_if():
@@ -106,51 +102,68 @@ def handle_pkt(packet, flows, counters):
 
     ETHERNET_HEADER_LENGTH = 14
     MPLS_HEADER_LENGTH = 4
-    IP_HEADER_LENGTH = 20
-    ICMP_HEADER_LENGTH = 8
-    UDP_HEADER_LENGTH = 8
-    TCP_HEADER_LENGTH = 20
-    INT_HEADER_LENGTH = 10 # 10 byte = 80 bits
-    INT_METADATA_LENGTH = 10 # 10 bytes = 80 bits
+    #IP_HEADER_LENGTH = 20
+    #ICMP_HEADER_LENGTH = 8
+    #UDP_HEADER_LENGTH = 8
+    #TCP_HEADER_LENGTH = 20
+    #INT_HEADER_LENGTH = 10 # 10 byte = 80 bits
+    #INT_METADATA_LENGTH = 10 # 10 bytes = 80 bits
+    CAMINO_LENGTH = 10 # 10 bytes = 80 bits
 
 
     ETHERNET_OFFSET = 0 + ETHERNET_HEADER_LENGTH
-    INT_HEADER_OFFSET = ETHERNET_OFFSET + IP_HEADER_LENGTH
-    INT_METADATA_OFFSET = INT_HEADER_OFFSET + INT_HEADER_LENGTH
+    CAMINO_OFFSET = ETHERNET_OFFSET + CAMINO_LENGTH
+    #INT_HEADER_OFFSET = ETHERNET_OFFSET + IP_HEADER_LENGTH
+    #INT_METADATA_OFFSET = INT_HEADER_OFFSET + INT_HEADER_LENGTH
+    
 
     eth_h = Ether(pkt[0:ETHERNET_OFFSET])
     eth_h.show()
 
-    int_h = INT_HEADER(pkt[INT_HEADER_OFFSET:(INT_HEADER_OFFSET+INT_HEADER_LENGTH)])
-    int_h.show()
+    #int_h = INT_HEADER(pkt[INT_HEADER_OFFSET:(INT_HEADER_OFFSET+INT_HEADER_LENGTH)])
+    #int_h.show()
 
-    f = open('int_data_h3h2.txt', 'a')
+    camino_h = CAMINO_HEADER(pkt[CAMINO_OFFSET:(CAMINO_OFFSET+CAMINO_LENGTH)])
+    camino_h.show()
+
+    ##f = open('int_data_h1h2.txt', 'a')
+    ##f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
+    ##f.write("\nThis is the INT data collected from the traffic flow between h1 and h2.\n")
+#
+    #ft = open('timestamps_h1h2.txt', 'a')
+#
+    #for x in range(0, int_h.total_hop_cnt):
+#
+    #    int_m = INT_METADATA(pkt[INT_METADATA_OFFSET:(INT_METADATA_OFFSET+INT_METADATA_LENGTH)])
+    #    int_m.show()
+#
+    #    f.write("\n\nSwitch ID %d: " % (x+1))
+    #    f.write(str(int_m.sw_id))
+#
+    #    f.write("\nEgress timestamp %d: " % (x+1))
+    #    f.write(str(int_m.egress_timestamp))
+    #    f.write("\n")
+    #    f.write("////////////////////////////////////////////////////////////////////////")
+#
+    #    ft.write(str(int_m.egress_timestamp))
+    #    ft.write("\n")
+#
+    #    INT_METADATA_OFFSET = INT_METADATA_OFFSET + INT_METADATA_LENGTH
+#
+#
+    #f.close()
+    #ft.close()
+    #sys.stdout.flush()
+
+
+    f = open ('camino.txt', 'a')
     f.write("\n\n\n////////////////////////////////////////////////////////////////////////")
-    f.write("\nThis is the INT data collected from the traffic flow between h3 and h2.\n")
-
-    ft = open('timestamps_h3h2.txt', 'a')
-
-    for x in range(0, int_h.total_hop_cnt):
-
-        int_m = INT_METADATA(pkt[INT_METADATA_OFFSET:(INT_METADATA_OFFSET+INT_METADATA_LENGTH)])
-        int_m.show()
-
-        f.write("\n\nSwitch ID %d: " % (x+1))
-        f.write(str(int_m.sw_id))
-
-        f.write("\nEgress timestamp %d: " % (x+1))
-        f.write(str(int_m.egress_timestamp))
-        f.write("\n")
-        f.write("////////////////////////////////////////////////////////////////////////")
-
-        ft.write(str(int_m.egress_timestamp))
-        ft.write("\n")
-
-        INT_METADATA_OFFSET = INT_METADATA_OFFSET + INT_METADATA_LENGTH
+    f.write("\nThis is the fastest link\n")
+    f.write(str(camino_h.camino))
+    f.write("////////////////////////////////////////////////////////////////////////")
 
 
     f.close()
-    ft.close()
     sys.stdout.flush()
 
 
@@ -161,7 +174,7 @@ def main():
     print("sniffing on %s" % args.interface)
     sys.stdout.flush()
     sniff(
-        lfilter = lambda d: d.src == '00:00:00:00:00:1c', #or 00:00:00:00:00:1c, # MAC del host origen
+        lfilter = lambda d: d.src == '00:00:00:00:00:1D',  # MAC del host origen
         iface = args.interface,
         prn = lambda x: handle_pkt(x, flows, counters))
 
