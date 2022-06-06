@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- // EDITED BY ISABEL PLAZA VAS, I2T, EIB, UPV - EHU
+ // EDITED BY MATTIN A. ELORZA FORCADA, I2T, EIB, UPV - EHU
 
 
 #include <core.p4>
@@ -55,11 +55,14 @@ const bit<8> IP_PROTO_TCP    = 6;
 const bit<8> IP_PROTO_UDP    = 17;
 const bit<8> IP_PROTO_SRV6   = 43;
 const bit<8> IP_PROTO_ICMPV6 = 58;
+const bit<8> IP_PROTO_CAMINO = 0xFD; //For camino protocol, value is not used in any other protocol
 const bit<8> IP_PROTO_INT    = 0xFE; //use a value that is not used by any other protocol
-const bit<8> IP_PROTO_CAMINO = 0XFC; // para el camino
 
 const mac_addr_t IPV6_MCAST_01 = 0x33_33_00_00_00_01;
-const mac_addr_t MAC_DST_H2 = 0x00_00_00_00_00_1B; 
+const mac_addr_t MAC_DST_H1 = 0x00_00_00_00_00_1A; //for packets sent from the collector to the first switch
+const mac_addr_t MAC_DST_H2 = 0x00_00_00_00_00_1B;
+const mac_addr_t MAC_DST_H3 = 0x00_00_00_00_00_1C;  //for packets sent from the collector to the first switch
+const mac_addr_t MAC_SRC_COLLECTOR = 0x00_00_00_00_00_1D;
 
 const bit<8> ICMP6_TYPE_NS = 135;
 const bit<8> ICMP6_TYPE_NA = 136;
@@ -173,10 +176,6 @@ header int_header_t {  //multiple of 8 size
     bit<8>    instruction_mask;  //INT instructions
 }
 
-header camino_t {
-    bit<32>    camino;
-}
-
 /*
 INT INSTRUCTIONS BITMAP:
 
@@ -198,6 +197,11 @@ header int_metadata_t {
 header int_data_header_t {
     bit<32>  switch_id;
     bit<48>  egress_timestamp;
+}
+
+header camino_header_t{
+    bit<32> switch_id;
+    bit<48> camino_id; // ID DEL CAMINO
 }
 
 
@@ -232,6 +236,7 @@ struct parsed_headers_t {
     int_header_t int_header;
     int_metadata_t int_metadata;
     int_data_header_t int_data_header;
+    camino_header_t camino_header;
     tcp_t tcp;
     udp_t udp;
     icmp_t icmp;
@@ -248,6 +253,8 @@ struct local_metadata_t {
     bit<8>      icmp_type;
     bool        is_int;
     bit<32>     sw_id;
+    bool        is_camino;
+    bit<32>     camino_id;
 }
 
 
@@ -286,11 +293,13 @@ parser ParserImpl (packet_in packet,
         packet.extract(hdr.ipv4);
         local_metadata.ip_proto = hdr.ipv4.protocol;
         local_metadata.is_int = false;
+        local_metadata.is_camino = false;
         transition select(hdr.ipv4.protocol) {
             IP_PROTO_TCP: parse_tcp;
             IP_PROTO_UDP: parse_udp;
             IP_PROTO_ICMP: parse_icmp;
             IP_PROTO_INT: parse_int;
+            IP_PROTO_CAMINO: parse_camino;
             default: accept;
         }
     }
@@ -388,6 +397,16 @@ parser ParserImpl (packet_in packet,
         local_metadata.is_int = true;
         transition accept;
     }
+
+    /////////////////////////////
+
+    state parse_camino {
+        packet.extract(hdr.camino_header);
+        bit<48> camino_id = hdr.camino_header.camino_id;
+        local_metadata.is_camino = true;
+        transition accept;
+
+    }
 }
 
 
@@ -439,7 +458,7 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
      action set_egress_port(port_num_t port_num) {
         standard_metadata.egress_spec = port_num;
-     }
+     }// same to l2_forward
 
      table l2_exact_table {
         key = {
@@ -461,6 +480,11 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
      action set_sw_id(bit<32> sw_id) {
         local_metadata.sw_id = sw_id;
+     }
+
+     /////////
+     action set_camino_id(bit<48> camino_id){
+         local_metadata.camino_id = camino_id;
      }
 
      table sw_id_table {
@@ -741,6 +765,31 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
 
         }
 
+        ////////////////////////
+
+        if(hdr.ipv4.isValid() && !local_metadata.is_camino && hdr.ethernet.src_addr == MAC_SRC_COLLECTOR ){
+            hdr.camino_header.setValid();
+            hdr.camino_header.switch_id = local_metadata.sw_id; // Set switch ID
+            hdr.camino_header.camino_id = local_metadata.camino_id;
+            //hdr.camino_header.camino = 1; // PRUEBA PARA QUE EL CAMINO POR DEFECTO SEA EL 1
+            hdr.ipv4.protocol = IP_PROTO_CAMINO; // SET camino AS NEXT PROTOCOL
+
+            if(local_metadata.sw_id == 1){
+                hdr.camino_header.setInvalid();
+                hdr.ipv4.protocol=IP_PROTO_TCP;
+
+            }
+
+            if(local_metadata.sw_id == 2){
+                set_egress_port(1);
+            }
+
+            if(local_metadata.sw_id == 3){
+                set_egress_port(1);
+            }
+            
+        }
+
         //If it is the last hop and the packet's final destination is not the Collector (so it is h2, in this case),
         //set every INT header invalid and restore the original next protocol in the IP header (TCP in this case)
         if (local_metadata.sw_id == 2 && standard_metadata.egress_port != COLLECTOR_PORT) {
@@ -749,7 +798,7 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
             hdr.int_metadata.setInvalid();
             hdr.int_header.setInvalid();
 
-            hdr.ipv4.protocol = IP_PROTO_TCP; // entiendo que habria que cambiar este parametro para que reconozca los pings
+            hdr.ipv4.protocol = IP_PROTO_TCP;
 
         }
 
@@ -819,10 +868,10 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
         packet.emit(hdr.int_header);
         packet.emit(hdr.int_metadata);
         packet.emit(hdr.int_data_header);
+        packet.emit(hdr.camino_header);
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);
         packet.emit(hdr.icmp);
-        packet.emit(hdr.sw_id); //para que salga el switch id 
     }
 }
 
