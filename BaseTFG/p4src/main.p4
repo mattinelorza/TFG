@@ -26,6 +26,7 @@
 // the controller will be seen by the P4 pipeline as coming from the CPU_PORT.
 #define CPU_PORT 255
 #define COLLECTOR_PORT 4
+#define DEFAULT_ROUTE 1
 
 // CPU_CLONE_SESSION_ID specifies the mirroring session for packets to be cloned
 // to the CPU port. Packets associated with this session ID will be cloned to
@@ -55,7 +56,7 @@ const bit<8> IP_PROTO_TCP    = 6;
 const bit<8> IP_PROTO_UDP    = 17;
 const bit<8> IP_PROTO_SRV6   = 43;
 const bit<8> IP_PROTO_ICMPV6 = 58;
-const bit<8> IP_PROTO_CAMINO = 0xFD; //For camino protocol, value is not used in any other protocol
+const bit<8> IP_PROTO_PATH = 0xFD; //For path protocol, value is not used in any other protocol
 const bit<8> IP_PROTO_INT    = 0xFE; //use a value that is not used by any other protocol
 
 const mac_addr_t IPV6_MCAST_01 = 0x33_33_00_00_00_01;
@@ -199,9 +200,9 @@ header int_data_header_t {
     bit<48>  egress_timestamp;
 }
 
-header camino_header_t{
+header path_header_t{
     bit<32> switch_id;
-    bit<48> camino_id; // ID DEL CAMINO
+    bit<48> path_id; // ID DEL path
 }
 
 
@@ -236,7 +237,7 @@ struct parsed_headers_t {
     int_header_t int_header;
     int_metadata_t int_metadata;
     int_data_header_t int_data_header;
-    camino_header_t camino_header;
+    path_header_t path_header;
     tcp_t tcp;
     udp_t udp;
     icmp_t icmp;
@@ -253,8 +254,8 @@ struct local_metadata_t {
     bit<8>      icmp_type;
     bool        is_int;
     bit<32>     sw_id;
-    bool        is_camino;
-    bit<32>     camino_id;
+    bool        is_path;
+    bit<48>     path_id;
 }
 
 
@@ -293,13 +294,13 @@ parser ParserImpl (packet_in packet,
         packet.extract(hdr.ipv4);
         local_metadata.ip_proto = hdr.ipv4.protocol;
         local_metadata.is_int = false;
-        local_metadata.is_camino = false;
+        local_metadata.is_path = false;
         transition select(hdr.ipv4.protocol) {
             IP_PROTO_TCP: parse_tcp;
             IP_PROTO_UDP: parse_udp;
             IP_PROTO_ICMP: parse_icmp;
             IP_PROTO_INT: parse_int;
-            IP_PROTO_CAMINO: parse_camino;
+            IP_PROTO_PATH: parse_path;
             default: accept;
         }
     }
@@ -400,10 +401,10 @@ parser ParserImpl (packet_in packet,
 
     /////////////////////////////
 
-    state parse_camino {
-        packet.extract(hdr.camino_header);
-        bit<48> camino_id = hdr.camino_header.camino_id;
-        local_metadata.is_camino = true;
+    state parse_path {
+        packet.extract(hdr.path_header);
+        bit<48> path_id = hdr.path_header.path_id;
+        local_metadata.is_path = true;
         transition accept;
 
     }
@@ -483,8 +484,8 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
      }
 
      /////////
-     action set_camino_id(bit<48> camino_id){
-         local_metadata.camino_id = camino_id;
+     action set_path_id(bit<48> path_id){
+         local_metadata.path_id = path_id;
      }
 
      table sw_id_table {
@@ -665,6 +666,31 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
 
     apply {
 
+        local_metadata.path_id = DEFAULT_ROUTE;
+
+         if(hdr.ipv4.isValid() && hdr.ethernet.src_addr == MAC_SRC_COLLECTOR ){
+            hdr.path_header.setValid();
+            hdr.path_header.switch_id = local_metadata.sw_id; // Set switch ID
+            hdr.path_header.path_id = local_metadata.path_id;
+            //hdr.path_header.path = 1; // PRUEBA PARA QUE EL path POR DEFECTO SEA EL 1
+            hdr.ipv4.protocol = IP_PROTO_PATH; // SET path AS NEXT PROTOCOL
+
+            if(local_metadata.sw_id == 1){
+                hdr.path_header.setInvalid();
+                hdr.ipv4.protocol=IP_PROTO_TCP;
+
+            }
+
+            if(local_metadata.sw_id == 2){
+                set_egress_port(1);
+            }
+
+            if(local_metadata.sw_id == 3){
+                set_egress_port(1);
+            }
+            
+        }
+
         if (sw_id_table.apply().hit){
         }
 
@@ -765,31 +791,6 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
 
         }
 
-        ////////////////////////
-
-        if(hdr.ipv4.isValid() && !local_metadata.is_camino && hdr.ethernet.src_addr == MAC_SRC_COLLECTOR ){
-            hdr.camino_header.setValid();
-            hdr.camino_header.switch_id = local_metadata.sw_id; // Set switch ID
-            hdr.camino_header.camino_id = local_metadata.camino_id;
-            //hdr.camino_header.camino = 1; // PRUEBA PARA QUE EL CAMINO POR DEFECTO SEA EL 1
-            hdr.ipv4.protocol = IP_PROTO_CAMINO; // SET camino AS NEXT PROTOCOL
-
-            if(local_metadata.sw_id == 1){
-                hdr.camino_header.setInvalid();
-                hdr.ipv4.protocol=IP_PROTO_TCP;
-
-            }
-
-            if(local_metadata.sw_id == 2){
-                set_egress_port(1);
-            }
-
-            if(local_metadata.sw_id == 3){
-                set_egress_port(1);
-            }
-            
-        }
-
         //If it is the last hop and the packet's final destination is not the Collector (so it is h2, in this case),
         //set every INT header invalid and restore the original next protocol in the IP header (TCP in this case)
         if (local_metadata.sw_id == 2 && standard_metadata.egress_port != COLLECTOR_PORT) {
@@ -868,7 +869,7 @@ control DeparserImpl(packet_out packet, in parsed_headers_t hdr) {
         packet.emit(hdr.int_header);
         packet.emit(hdr.int_metadata);
         packet.emit(hdr.int_data_header);
-        packet.emit(hdr.camino_header);
+        packet.emit(hdr.path_header);
         packet.emit(hdr.tcp);
         packet.emit(hdr.udp);
         packet.emit(hdr.icmp);
