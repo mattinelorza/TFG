@@ -31,3 +31,5 @@ p4Runtime leido
 * Comparación de retardos entre rutas OK.
 * Selección de la ruta óptima OK.
 * Generación de paquetes con path_header desde el colector OK.
+* Llegada de paquetes al otro extremo OK.
+* Register en prueba.
