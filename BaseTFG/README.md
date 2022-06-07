@@ -18,13 +18,13 @@ Para arrancar la maqueta:
       $ make netcfg
    2. mininet> h1 ping h2 (y viceversa)
    3. $ make app-reload
-   4. mininet> h1 arp -i h1-eth0 -s 172.16.1.2 00:00:00:00:00:1B
-      mininet> h2 arp -i h2-eth0 -s 172.16.1.1 00:00:00:00:00:1A
-      mininet> h1 arp -i h1-eth0 -s 172.16.1.4 00:00:00:00:00:1D
-      mininet> collector arp -i collector-eth0 -s 172.16.1.1 00:00:00:00:00:1A
-      mininet> collector ping h1
-      mininet> h1 ping collector
-      mininet> h1 ping h2
+   4. * mininet> h1 arp -i h1-eth0 -s 172.16.1.2 00:00:00:00:00:1B
+      * mininet> h2 arp -i h2-eth0 -s 172.16.1.1 00:00:00:00:00:1A
+      * mininet> h1 arp -i h1-eth0 -s 172.16.1.4 00:00:00:00:00:1D
+      * mininet> collector arp -i collector-eth0 -s 172.16.1.1 00:00:00:00:00:1A
+      * mininet> collector ping h1
+      * mininet> h1 ping collector
+      * mininet> h1 ping h2
       
       
       
