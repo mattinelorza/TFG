@@ -2,7 +2,6 @@
 
 //////////////////////////////////////////////////////////////
 
-Rama int_fase1:
 
 ( El historial de commits del desarrollo de la fase previa se encuentran disponibles en el repositorio http://github.com/isabelplaza/PruebaINT.git )
 
