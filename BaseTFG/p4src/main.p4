@@ -680,8 +680,15 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     
 
     apply {
-
+        
+        if(ruta_opt.read(hdr.path_header.path_id, 0) == 0){
+        
         local_metadata.path_id = DEFAULT_ROUTE ; //RUTA POR DEFECTO
+        
+        
+        }
+        
+         
 
          if(hdr.ipv4.isValid() && hdr.ethernet.src_addr == MAC_COLLECTOR ){
             // hdr.path_header.setValid();
