@@ -47,17 +47,17 @@ class MPLS(Packet):
 
 
 
-class CAMINO_HEADER(Packet):
-    name="CAMINO_HEADER"
+class PATH_HEADER(Packet):
+    name="PATH_HEADER"
     fields_desc = [
         BitField("sw_id", 1, 32),
-        BitField("camino", 1, 48)
+        BitField("path_id", 1, 48)
 
     ]
 
 
 bind_layers(Ether, IP, type=0x0800)
-bind_layers(IP, CAMINO_HEADER, protocol=0xFD)
+bind_layers(IP, PATH_HEADER, protocol=0xFD)
 
 def main():
 
@@ -79,7 +79,7 @@ def main():
 
    
     if args.path:
-        pkt = pkt / CAMINO_HEADER(camino=args.path) # selección del correcto
+        pkt = pkt / PATH_HEADER(path_id=args.path) # selección del correcto
 
     if args.udp:
         pkt = pkt / UDP(sport=0, dport=args.udp)
