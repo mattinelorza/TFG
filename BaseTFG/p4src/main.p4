@@ -700,11 +700,10 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             if(local_metadata.sw_id == 1){
                 
                 local_metadata.path_id=hdr.path_header.path_id;
-                ruta_opt.write(0,hdr.path_header.path_id);
-                ruta_opt.read(hdr.path_header.path_id, 0); // para asignarle el registro a la ruta por defecto 
+                ruta_opt.write(0,hdr.path_header.path_id);                        
                 hdr.path_header.setInvalid();
                 hdr.ipv4.protocol=IP_PROTO_TCP;
-                mark_to_drop(standard_metadata); // para que luego salga bien en wireshark 
+                mark_to_drop(standard_metadata); // capture of well formed packets in wireshark 
 
             }
 
