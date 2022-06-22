@@ -26,7 +26,8 @@
 // the controller will be seen by the P4 pipeline as coming from the CPU_PORT.
 #define CPU_PORT 255
 #define COLLECTOR_PORT 4
-#define DEFAULT_ROUTE 2
+#define DEFAULT_ROUTE 1
+
 
 // CPU_CLONE_SESSION_ID specifies the mirroring session for packets to be cloned
 // to the CPU port. Packets associated with this session ID will be cloned to
@@ -412,7 +413,7 @@ parser ParserImpl (packet_in packet,
 
     state parse_path {
         packet.extract(hdr.path_header);
-        //bit<48> path_id = hdr.path_header.path_id;
+        local_metadata.path_id = hdr.path_header.path_id;
         local_metadata.is_path = true;
         transition accept;
 
@@ -680,17 +681,21 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
     
 
     apply {
-        
-        if(ruta_opt.read(hdr.path_header.path_id, 0) == 0){
-        
-        local_metadata.path_id = DEFAULT_ROUTE ; //RUTA POR DEFECTO
-        
-        
-        }
-        
-         
 
-         if(hdr.ipv4.isValid() && hdr.ethernet.src_addr == MAC_COLLECTOR ){
+        ruta_opt.read(hdr.path_header.path_id,0); 
+
+        if(hdr.path_header.path_id == 0) { //hdr.path_header.path_id
+
+
+            local_metadata.path_id = DEFAULT_ROUTE ; //RUTA POR DEFECTO
+            hdr.path_header.path_id = DEFAULT_ROUTE ;
+
+        }
+
+        //local_metadata.path_id = DEFAULT_ROUTE ; //RUTA POR DEFECTO
+         local_metadata.path_id=hdr.path_header.path_id;
+
+         if(hdr.ipv4.isValid() && hdr.ethernet.src_addr == MAC_COLLECTOR || hdr.ethernet.dst_addr == MAC_DST_H2){
             // hdr.path_header.setValid();
             // hdr.path_header.switch_id = local_metadata.sw_id; // Set switch ID
             // hdr.path_header.path_id = local_metadata.path_id;
@@ -700,20 +705,22 @@ control IngressPipeImpl (inout parsed_headers_t    hdr,
             if(local_metadata.sw_id == 1){
                 
                 local_metadata.path_id=hdr.path_header.path_id;
-                ruta_opt.write(0,hdr.path_header.path_id);                        
+                ruta_opt.write(0,hdr.path_header.path_id); //hdr.path_header.path_id
                 hdr.path_header.setInvalid();
                 hdr.ipv4.protocol=IP_PROTO_TCP;
-                mark_to_drop(standard_metadata); // capture of well formed packets in wireshark 
+                mark_to_drop(standard_metadata); // para que luego salga bien en wireshark 
 
             }
 
             if(local_metadata.sw_id == 2){
                 local_metadata.path_id=hdr.path_header.path_id;
+                ruta_opt.write(0,hdr.path_header.path_id); 
                 set_egress_port(1);
             }
 
             if(local_metadata.sw_id == 3){
                 local_metadata.path_id=hdr.path_header.path_id;
+                ruta_opt.write(0,hdr.path_header.path_id); 
                 set_egress_port(1);
             }
             
