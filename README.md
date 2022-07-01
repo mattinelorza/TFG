@@ -44,23 +44,26 @@ p4Runtime leido
 Tras realizar un cambio en la maqueta:
 
    1. `make p4-build`
-   2. 'make app-build' 
+   2. `make app-build`
 
 
 Para arrancar la maqueta:
   
-   1. $ make start-v4
-      $ make app-reload
-      $ make netcfg
-   2. mininet> h1 ping h2 (y viceversa)
-   3. $ make app-reload
-   4. * mininet> h1 arp -i h1-eth0 -s 172.16.1.2 00:00:00:00:00:1B
-      * mininet> h2 arp -i h2-eth0 -s 172.16.1.1 00:00:00:00:00:1A
-      * mininet> h1 arp -i h1-eth0 -s 172.16.1.4 00:00:00:00:00:1D
-      * mininet> collector arp -i collector-eth0 -s 172.16.1.1 00:00:00:00:00:1A
-      * mininet> collector ping h1
-      * mininet> h1 ping collector
-      * mininet> h1 ping h2
+   1. $ `make start-v4`
+      $ `make app-reload`
+      $ `make netcfg`
+   2. mininet> `h1 ping h2` (y viceversa)
+   3. $ `make app-reload`
+   4. * mininet> `h1 arp -i h1-eth0 -s 172.16.1.2 00:00:00:00:00:1B`
+      * mininet> `h3 arp -i h3-eth0 -s 172.16.1.3 00:00:00:00:00:1B`
+      * mininet> `h2 arp -i h2-eth0 -s 172.16.1.1 00:00:00:00:00:1A`
+      * mininet> `h2 arp -i h2-eth0 -s 172.16.1.3 00:00:00:00:00:1C`
+      * mininet> `h1 arp -i h1-eth0 -s 172.16.1.4 00:00:00:00:00:1D`
+      * mininet> `collector arp -i collector-eth0 -s 172.16.1.1 00:00:00:00:00:1A`
+      * mininet> `collector ping h1`
+      * mininet> `h1 ping collector`
+      * mininet> `h1 ping h2`
+      * mininet> `h3 ping h2`
       
       
       
@@ -85,7 +88,7 @@ Para poder ejecutar iperf:
 
 
 
-Estas son las instrucciones para tener en el contenedor Docker los ficheros de send.py y receive.py:
+Estas son las instrucciones para tener en el contenedor Docker los ficheros compartidos:
 
    1. Crear una carpera llamada "shared" en el directorio "./util/docker/stratum_bmv2/"
    2. Pegar en dicha carpeta la version definitiva de los ficheros send.py y receive.py. IMPORTANTE!!: Si se hace cualquier modificación, hay que recompilar la imagen de docker de nuevo (paso 4).
