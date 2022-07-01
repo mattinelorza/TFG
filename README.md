@@ -1,38 +1,5 @@
 # TFG
 
-## TUTORIALES
-Basic.p4 terminado
-
-
-Basic_tunnel.p4 falta el apartado del parser
-
-
-
-p4Runtime leido
-
-
-### ngsdn
-
-* Tutorial 1 error en el comando de los puertos
-
-* Tutorial 2 Finalizado
-
-* Tutorial 3 Finalizado
-
-* Tutorial 4 Finalizado
-
-* Tutorial 5 Parte 1 terminada
-
-# MAQUETA
-
-* Docker configurado
-* Comprobado que se consiguen velocidades de MB respecto a los KB obtenidos previamente.
-* Conseguido que se pongan bien los switch id.
-* Comparación de retardos entre rutas OK.
-* Selección de la ruta óptima OK.
-* Generación de paquetes con path_header Y path_id desde el colector OK.
-* Llegada de paquetes al otro extremo OK.
-* Register OK.
 
 # BaseTFG
 
@@ -118,4 +85,40 @@ Para capturar de manera adecuada
 
 `h1 ping -i 0.01 h2 -c 7000`
 * Hay que acordarse de meter con arp tambien el h3 para que funcione el ping
+
+## TUTORIALES
+Basic.p4 terminado
+
+
+Basic_tunnel.p4 falta el apartado del parser
+
+
+
+p4Runtime leido
+
+
+### ngsdn
+
+* Tutorial 1 error en el comando de los puertos
+
+* Tutorial 2 Finalizado
+
+* Tutorial 3 Finalizado
+
+* Tutorial 4 Finalizado
+
+* Tutorial 5 Parte 1 terminada
+
+# MAQUETA
+
+* Docker configurado
+* Comprobado que se consiguen velocidades de MB respecto a los KB obtenidos previamente.
+* Conseguido que se pongan bien los switch id.
+* Comparación de retardos entre rutas OK.
+* Selección de la ruta óptima OK.
+* Generación de paquetes con path_header Y path_id desde el colector OK.
+* Llegada de paquetes al otro extremo OK.
+* Register OK.
+
+
 
