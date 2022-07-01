@@ -30,6 +30,7 @@ p4Runtime leido
 * Conseguido que se pongan bien los switch id.
 * Comparación de retardos entre rutas OK.
 * Selección de la ruta óptima OK.
-* Generación de paquetes con path_header desde el colector OK.
+* Generación de paquetes con path_header Y path_id desde el colector OK.
 * Llegada de paquetes al otro extremo OK.
-* Register en prueba.
+* Register OK.
+
